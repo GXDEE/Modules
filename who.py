@@ -1,5 +1,5 @@
 #module: who
-#creator: @GXDEE
+#meta developer: GXDEE.t.me
 
 from .. import loader, utils
 @loader.tds

@@ -1,5 +1,5 @@
 #module: AFK
-#creator: @GXDEE
+#meta developer: GXDEE.t.me
 
 from .. import loader, utils
 import time

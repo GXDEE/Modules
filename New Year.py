@@ -20,7 +20,7 @@ class NewYear(loader.Module):
     def __init__(self):
         self.config = loader.ModuleConfig(
             "TIMEZONE_OFFSET", 3, "смещение часового пояса от UTC",
-            "MEDIA_URL", "", "ссылка на файл или ID сообщения из избранного",
+            "MEDIA_URL", "", "ссылка на файл",
             "SAVED_MSG_ID", 0, "ID сохраненного сообщения в избранном"
         )
     def get_timezone_str(self, offset):

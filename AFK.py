@@ -10,7 +10,6 @@ import pytz
 
 @loader.tds
 class AFK(loader.Module):
-    """creator: @GXDEE"""
 
     strings = {"name": "AFK"}
 
@@ -416,3 +415,5 @@ class AFK(loader.Module):
 
         if mention:
             await self.reply(message.chat_id, message.id, True)
+
+#TODO переписать логику для тегов, сейчас серьёзные проблемы с этим потому что фильтр стоит на любой тэг, не обязательно юзера, следаловательно, надо получить тэг юзера и сохранить его в конфиге, исключить автоответ в чатах с ботами и для ботов в группе, проверка на юзер акк

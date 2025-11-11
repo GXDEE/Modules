@@ -4,7 +4,6 @@
 from .. import loader, utils
 @loader.tds
 class Who(loader.Module):
-    """Creator: @GXDEE"""
     strings = {"name": "who"}
 
 #1#
@@ -103,3 +102,4 @@ class Who(loader.Module):
             text=text,
             parse_mode="HTML"
         )
+#TODO добавить логику для чека видаоватарка у человека или нет, если видео то качать как mov а не PNG, сделать блок текстовых переменных в начале кода а не в блоке вывода функции, в вводе использовать текстовые переменные вместо текста 

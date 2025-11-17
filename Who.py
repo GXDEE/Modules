@@ -1,10 +1,10 @@
-#module: who
+#module: Who
 #meta developer: GXDEE.t.me
 
 from .. import loader, utils
 @loader.tds
 class Who(loader.Module):
-    strings = {"name": "who"}
+    strings = {"name": "Who"}
 
 #1#
 

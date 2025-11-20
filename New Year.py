@@ -1,5 +1,6 @@
-#module: New Year
-#meta developer: GXDEE.t.me
+# module: New Year
+# meta developer: GXDEE.t.me
+# version: 1.0.0
 
 from .. import loader, utils
 from datetime import datetime, timezone, timedelta
@@ -147,7 +148,7 @@ class NewYear(loader.Module):
                     await utils.answer(message, self.media_added, file=reply.media)
                     return
                 except Exception as e:
-                    await utils.answer(message, f"<b>Ошибка при сохранении:</b> <code>{str(e)}</code>")
+                    await utils.answer(message, f"<b>Unknown error:</b> <code>{str(e)}</code>")
                     return
             if len(args_list) < 2:
                 await utils.answer(message, self.invalid_media)

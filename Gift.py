@@ -1,3 +1,5 @@
+__version__ = ("-beta",1,0)
+
 # module: Gift
 # meta developer: GXDEE.t.me
 

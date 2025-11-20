@@ -1,6 +1,8 @@
+__version__ = ("-release",1,0)
+
 # module: New Year
 # meta developer: GXDEE.t.me
-# version: 1.0.0
+
 
 from .. import loader, utils
 from datetime import datetime, timezone, timedelta

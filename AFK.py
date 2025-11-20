@@ -1,3 +1,5 @@
+__version__ = ("-beta",1,0)
+
 # module: AFK
 # meta developer: GXDEE.t.me
 

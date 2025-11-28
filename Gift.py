@@ -11,7 +11,7 @@ from telethon.tl.types import Message
 from .. import loader, utils 
 logger = logging.getLogger(__name__)
 @loader.tds
-class DirectGiftModule(loader.Module):
+class Gift(loader.Module):
     strings = {"name": "Gift"}
     gift_sent_message = "<emoji document_id=5249506765170572814>🎁</emoji><b> Успех</b>"
     usage_text = "<emoji document_id=5248950420876853871>🥰</emoji><b> Команды модуля Gift:</b>\n<blockquote expandable><b>.gift [число]</b> - отправить подарок в виде стикера, где число - это индекс подарка\n<b>.gift list</b> - показать список доступных подарков</blockquote>"

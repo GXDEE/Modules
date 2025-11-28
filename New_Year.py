@@ -1,14 +1,14 @@
 __version__ = ("-release",1,0)
 
-# module: New Year
+# module: New_Year
 # meta developer: GXDEE.t.me
 
 
 from .. import loader, utils
 from datetime import datetime, timezone, timedelta
 @loader.tds
-class NewYear(loader.Module):
-    strings = {"name": "New Year"}
+class New_Year(loader.Module):
+    strings = {"name": "New_Year"}
     help_text = "<emoji document_id=5215241189665571769>☃️</emoji><b> Команды модуля New Year:</b>\n<blockquote expandable><b>.new year</b> - показать время до Нового года\n<b>.new set [часовой пояс]</b> - установить часовой пояс (от -12 до +12)\n<b>.new add [прямая ссылка/реплай на медиа]</b> - добавить медиафайл для отправки с .new year\n<b>.new remove</b> - удалить медиафайл\n\n<b>Примеры:</b>\n<code>.new set 3</code> - установить UTC+3 (Москва)\n<code>.new set -5</code> - установить UTC-5 (Нью-Йорк)\n<code>.new add https://example.com/ny.gif</code> - добавить гифку</blockquote>"
     new_year_template = "<emoji document_id=5212986052662297552>🎩</emoji><b> До Нового {year} года осталось:</b>\n\n<emoji document_id=5217611071015125647>🎆</emoji><b> Дней: </b><code>{days}</code>\n<emoji document_id=5217496236474531914>🕯</emoji><b> Часов: </b><code>{hours}</code>\n<emoji document_id=5215645221534075191>🫐</emoji><b> Минут: </b><code>{minutes}</code>\n<emoji document_id=5213026914981153242>🎄</emoji><b> Секунд: </b><code>{seconds}</code>\n\n<blockquote><emoji document_id=5213038163500499521>🍪</emoji><b> Часовой пояс: </b>UTC{timezone_str}\n<emoji document_id=5213024307936005301>☕️</emoji><b> Текущее время: </b>{current_time}</blockquote>"
     timezone_set = "<emoji document_id=5213276280782356417>👌</emoji><b> Часовой пояс установлен: </b>UTC{timezone_str}"    

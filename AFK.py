@@ -189,7 +189,7 @@ class AFK(loader.Module):
 
 
     @loader.command(ru_doc="Инструкция к модулю AFK")
-    async def afk(self, message):
+    async def AFK(self, message):
         args = utils.get_args_raw(message)
 
         if not args:

@@ -15,7 +15,7 @@ class Who(loader.Module):
 
 #2#
 
-    @loader.command(ru_doc="Gives information about user")
+    @loader.command(ru_doc="привет Deklaren")
     async def who(self, message):
         check_reply = message.is_reply
         if not check_reply:

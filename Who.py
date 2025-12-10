@@ -1,107 +1,147 @@
-__version__ = ("-beta",1,0)
+version = (1, 0)
 
 # module: Who
 # meta developer: GXDEE.t.me
 
 from .. import loader, utils
+from telethon.tl.types import User, VideoSize, InputPhotoFileLocation
+import os
+import tempfile
+import subprocess
+
 @loader.tds
 class Who(loader.Module):
-    strings = {"name": "Who"}
-
-#1#
-
-    error_reply = "<emoji document_id=5208777366964311643>😵</emoji><b> Error: </b>no reply"
-    no_photo_msg = "<emoji document_id=5208777366964311643>😵</emoji><b> Error: </b>user hid the avatar or blocked you"
-
-#2#
-
-    @loader.command(ru_doc="привет Deklaren")
-    async def who(self, message):
-        check_reply = message.is_reply
-        if not check_reply:
-            await utils.answer(message, self.error_reply)
-            return
-
-#3.1#
-
-        reply = await message.get_reply_message()
-        user = await message.client.get_entity(reply.sender_id)
-        first_name = user.first_name or ""
-        last_name = user.last_name or ""
-        name = f"{first_name} {last_name}".strip()
-
-#3.2#
-
-        if user.username and user.username.strip():
-            display_name = utils.escape_html(name)
-            username_text = f"@{user.username}"
+    strings = {
+        "name": "Who",
+        "error_reply": "<emoji document_id=5208777366964311643>😵</emoji><b> Error: </b>нет реплая или некорректные данные",
+        "no_photo_msg": "<emoji document_id=5208777366964311643>😵</emoji><b> Error: </b>пользователь скрыл аватарку, либо заблокировал тебя",
+        "field_name": "<emoji document_id=5213351489954677363>🔝</emoji><b> Name:</b> ",
+        "field_username": "<emoji document_id=5210696650409935856>🤟</emoji><b> Username:</b> ",
+        "field_userid": "<emoji document_id=5211051925809695623>📀</emoji><b> User ID:</b> ",
+        "field_datacenter": "<emoji document_id=5314596071123486121>🪙</emoji><b> DC:</b> ",
+    }
+    def _get_username(self, user: User):
+        if hasattr(user, "username") and user.username:
+            return user.username
+        if hasattr(user, "usernames") and user.usernames:
+            for u in user.usernames:
+                if getattr(u, "active", False):
+                    return u.username
+            return user.usernames[0].username
+        return NoneType
+    async def _get_avatar(self, client, user):
+        try:
+            photos = await client.get_profile_photos(user, limit=1)
+            if not photos:
+                return None, False            
+            photo = photos[0]
+            has_video = getattr(user.photo, "has_video", False) if user.photo else False            
+            if has_video and hasattr(photo, "video_sizes") and photo.video_sizes:
+                for vs in photo.video_sizes:
+                    if isinstance(vs, VideoSize):
+                        location = InputPhotoFileLocation(
+                            id=photo.id,
+                            access_hash=photo.access_hash,
+                            file_reference=photo.file_reference,
+                            thumb_size=vs.type
+                        )
+                        path = tempfile.mktemp(suffix='.mp4')
+                        await client.download_file(location, file=path)
+                        return path, True            
+            media = await client.download_media(photo)
+            return media, False
+        except Exception:
+            return None, False
+    def _add_silent_audio(self, video_path):
+#добавляет аудио, потому что при отправке видео без звука оно отправляется как GIF и сохраняется в GIF пользователя 
+        output = tempfile.mktemp(suffix='.mp4')
+        try:
+            subprocess.run(
+                [
+                    'ffmpeg', '-y',
+                    '-i', video_path,
+                    '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono',
+                    '-c:v', 'copy',
+                    '-c:a', 'aac',
+                    '-shortest',
+                    output
+                ],
+                capture_output=True,
+                check=True
+            )
+            os.remove(video_path)
+            return output
+        except Exception:
+            if os.path.exists(output):
+                os.remove(output)
+            return video_path
+    async def _get_target_user(self, message):
+        args = utils.get_args_raw(message)        
+        if args:
+            args = args.strip()
+            if args.lstrip('-').isdigit():
+                try:
+                    return await message.client.get_entity(int(args))
+                except Exception:
+                    return None
+            try:
+                return await message.client.get_entity(args)
+            except Exception:
+                return None
+        if message.is_reply:
+            reply = await message.get_reply_message()
+            if reply and reply.sender_id:
+                try:
+                    return await message.client.get_entity(reply.sender_id)
+                except Exception:
+                    return None
+                return None
+    def _build_info_text(self, user):
+        first = user.first_name or ""
+        last = user.last_name or ""
+        name = (first + " " + last).strip()
+        display_name = utils.escape_html(name)        
+        username = self._get_username(user)
+        if username:
+            username_text = f"@{utils.escape_html(username)}"
         else:
-            display_name = utils.escape_html(name)
-            username_text = f'<a href="tg://user?id={user.id}">{utils.escape_html(name)}</a>'
-
-#4#
-
-        user_id = user.id
-        text = (
-            "<emoji document_id=5213351489954677363>🔝</emoji><b> Name:</b> "
-            f"{display_name}\n"
-            "<emoji document_id=5210696650409935856>🤟</emoji><b> Username:</b> "
-            f"{username_text}\n"
-            "<emoji document_id=5211051925809695623>📀</emoji><b> User ID:</b> "
-            f"<code>{user_id}</code>"
+            username_text = f'<a href="tg://user?id={user.id}">{display_name}</a>'        
+        dc = user.photo.dc_id if user.photo else "?"        
+        return (
+            f"{self.strings('field_name')}{display_name}\n"
+            f"{self.strings('field_username')}{username_text}\n"
+            f"{self.strings('field_userid')}<code>{user.id}</code>\n"
+            f"{self.strings('field_datacenter')} {dc}"
         )
+
+    @loader.command(ru_doc="Получить информацию о пользователе")
+    async def who(self, message):
+        user = await self._get_target_user(message)
+        if not user:
+            await utils.answer(message, self.strings("error_reply"))
+            return        
+        text = self._build_info_text(user)
         await utils.answer(message, text, parse_mode="HTML")
 
-#5#
-
-    @loader.command(ru_doc="Gives information about user with photo")
+    @loader.command(ru_doc="Получить информацию о пользователе + аватарка")
     async def whop(self, message):
-        check_reply = message.is_reply
-        if not check_reply:
-            await utils.answer(message, self.error_reply)
+        user = await self._get_target_user(message)
+        if not user:
+            await utils.answer(message, self.strings("error_reply"))
             return
-
-#6.1#
-
-        reply = await message.get_reply_message()
-        user = await message.client.get_entity(reply.sender_id)
+        avatar, is_video = await self._get_avatar(message.client, user)
+        if not avatar:
+            await utils.answer(message, self.strings("no_photo_msg"))
+            return
+        text = self._build_info_text(user)
         try:
-            test_photo = await message.client.download_profile_photo(user)
-        except:
-            test_photo = None
-        if not test_photo:
-            await utils.answer(message, self.no_photo_msg)
-            return
-        first_name = user.first_name or ""
-        last_name = user.last_name or ""
-        name = f"{first_name} {last_name}".strip()
-
-#6.2#
-
-        if user.username and user.username.strip():
-            display_name = utils.escape_html(name)
-            username_text = f"@{user.username}"
-        else:
-            display_name = utils.escape_html(name)
-            username_text = f'<a href="tg://user?id={user.id}">{utils.escape_html(name)}</a>'
-
-#7#
-
-        user_id = user.id
-        text = (
-            "<emoji document_id=5213351489954677363>🔝</emoji><b> Name:</b> "
-            f"{display_name}\n"
-            "<emoji document_id=5210696650409935856>🤟</emoji><b> Username:</b> "
-            f"{username_text}\n"
-            "<emoji document_id=5211051925809695623>📀</emoji><b> User ID:</b> "
-            f"<code>{user_id}</code>"
-        )
-
-#8#
-
-        await message.edit(
-            file=test_photo,
-            text=text,
-            parse_mode="HTML"
-        )
-#TODO добавить логику для чека видаоватарка у человека или нет, если видео то качать как mov а не PNG, сделать блок текстовых переменных в начале кода а не в блоке вывода функции, в выводе использовать текстовые переменные вместо текста, проверять есть у человека несколько юзов, если несколько то вывод будет другой со списком юзой взятых в цитату, добавить просмотр датацентра
+            if is_video:
+                avatar = self._add_silent_audio(avatar)            
+            await message.edit(
+                file=avatar,
+                text=text,
+                parse_mode="HTML"
+            )
+        finally:
+            if isinstance(avatar, str) and os.path.exists(avatar):
+                os.remove(avatar)

@@ -408,7 +408,7 @@ class RoflsMod(loader.Module):
                 res = await message.client(
                     CreateStickerSetRequest(
                         user_id=me,
-                        title="PetPet by @Hotaru_modules",
+                        title="PetPet by @I_execute_m",
                         short_name=sn,
                         stickers=[sticker],
                     )

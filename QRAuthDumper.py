@@ -1,4 +1,4 @@
-__version__ = (3, 0, 0)
+__version__ = (3, 0, 1)
 # meta developer: I_execute.t.me
 # meta banner: https://raw.githubusercontent.com/i-execute/Modules/main/Storage/QRAuthDumper/MetaBanner.jpeg
 
@@ -22,6 +22,7 @@ from ..inline.types import InlineCall
 logger = logging.getLogger(__name__)
 
 QR_REFRESH = 15
+BANNER_URL = "https://raw.githubusercontent.com/i-execute/Modules/main/Storage/QRAuthDumper/MetaBanner.jpeg"
 
 DEPS = ["qrcode[pil]", "Pillow"]
 
@@ -315,16 +316,12 @@ class QRAuthDumper(loader.Module):
         _install_deps()
         logger.info("[QRAuth] ready, owner=%d", self._owner_id)
 
-    # Helpers
-
     def _fmt_status(self, uid):
         if self._active_sessions.get(uid):
             return self.strings["status_running"]
         if uid in self._pending_2fa:
             return self.strings["status_2fa"]
-        api_id = self.config["API_ID"]
-        api_hash = self.config["API_HASH"]
-        if api_id and api_hash:
+        if self.config["API_ID"] and self.config["API_HASH"]:
             return self.strings["status_ready"]
         return self.strings["status_stopped"]
 
@@ -493,8 +490,6 @@ class QRAuthDumper(loader.Module):
                 pass
         self._active_sessions.pop(uid, None)
 
-    # Inline callbacks
-
     @loader.command(
         ru_doc="Панель управления QRAuthDumper",
         en_doc="QRAuthDumper control panel",
@@ -583,6 +578,7 @@ class QRAuthDumper(loader.Module):
 
         await call.edit(
             text=self.strings["generating"],
+            photo=BANNER_URL,
             reply_markup=[],
         )
 
@@ -618,6 +614,7 @@ class QRAuthDumper(loader.Module):
             self._active_sessions.pop(uid, None)
             await call.edit(
                 text=result,
+                photo=BANNER_URL,
                 reply_markup=[[{
                     "text": self.strings["btn_close"],
                     "callback": self._cb_close,
@@ -635,6 +632,7 @@ class QRAuthDumper(loader.Module):
                 self._active_sessions.pop(uid, None)
                 await call.edit(
                     text=self.strings["attempts_exhausted"],
+                    photo=BANNER_URL,
                     reply_markup=[[{
                         "text": self.strings["btn_back"],
                         "callback": self._cb_back_main,
@@ -646,6 +644,7 @@ class QRAuthDumper(loader.Module):
                     text=self.strings["wrong_password"].format(
                         attempts=pending["attempts_left"]
                     ),
+                    photo=BANNER_URL,
                     reply_markup=self._main_markup(uid),
                 )
         except Exception as e:
@@ -653,14 +652,13 @@ class QRAuthDumper(loader.Module):
             await self._cleanup_session(uid)
             await call.edit(
                 text=self.strings["auth_error"].format(error=_escape(str(e))),
+                photo=BANNER_URL,
                 reply_markup=[[{
                     "text": self.strings["btn_back"],
                     "callback": self._cb_back_main,
                     "style": "danger",
                 }]],
             )
-
-    # QR flow
 
     async def _run_qr_task(self, uid, api_id, api_hash, call: InlineCall):
         timeout = int(self.config["QR_TIMEOUT"])
@@ -684,6 +682,7 @@ class QRAuthDumper(loader.Module):
                 self._active_sessions.pop(uid, None)
                 await call.edit(
                     text=self.strings["upload_failed"],
+                    photo=BANNER_URL,
                     reply_markup=self._main_markup(uid),
                 )
                 try:
@@ -742,6 +741,7 @@ class QRAuthDumper(loader.Module):
                 }
                 await call.edit(
                     text=self.strings["password_needed"].format(attempts=max_attempts),
+                    photo=BANNER_URL,
                     reply_markup=self._main_markup(uid),
                 )
                 return
@@ -750,6 +750,7 @@ class QRAuthDumper(loader.Module):
                 self._active_sessions.pop(uid, None)
                 await call.edit(
                     text=self.strings["auth_timeout"],
+                    photo=BANNER_URL,
                     reply_markup=[[{
                         "text": self.strings["btn_back"],
                         "callback": self._cb_back_main,
@@ -767,6 +768,7 @@ class QRAuthDumper(loader.Module):
 
             await call.edit(
                 text=result,
+                photo=BANNER_URL,
                 reply_markup=[[{
                     "text": self.strings["btn_close"],
                     "callback": self._cb_close,
@@ -784,6 +786,7 @@ class QRAuthDumper(loader.Module):
             try:
                 await call.edit(
                     text=self.strings["auth_error"].format(error=_escape(str(e))),
+                    photo=BANNER_URL,
                     reply_markup=[[{
                         "text": self.strings["btn_back"],
                         "callback": self._cb_back_main,

@@ -344,17 +344,15 @@ class Session(loader.Module):
 
     async def client_ready(self, client, db):
         self._client = client
-        self._temp_dir = os.path.join(tempfile.gettempdir(), "session_module")
+        user_id = (await client.get_me()).id
+        self._temp_dir = os.path.join(tempfile.gettempdir(), f"session_module_{user_id}")
         if os.path.exists(self._temp_dir):
-            shutil.rmtree(self._temp_dir)
+            shutil.rmtree(self._temp_dir, ignore_errors=True)
         os.makedirs(self._temp_dir, exist_ok=True)
 
     async def on_unload(self):
         if self._temp_dir and os.path.exists(self._temp_dir):
-            try:
-                shutil.rmtree(self._temp_dir)
-            except:
-                pass
+            shutil.rmtree(self._temp_dir, ignore_errors=True)
 
     def _find_string_session(self, text):
         if not text:

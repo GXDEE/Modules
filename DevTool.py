@@ -204,8 +204,6 @@ class _DetailParser(HTMLParser):
 
 
 async def _fetch(url: str, timeout: int = 20):
-    if not AIOHTTP_OK:
-        return None
     try:
         async with aiohttp.ClientSession() as s:
             async with s.get(url, timeout=aiohttp.ClientTimeout(total=timeout)) as r:

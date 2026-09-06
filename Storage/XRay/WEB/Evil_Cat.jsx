@@ -96,7 +96,7 @@ function App() {
       React.createElement("div", { className: "crosshair" }),
       React.createElement("div", { className: "cat-wrap", ref: holder })
     ),
-    React.createElement("div", { className: "hero-copy" }, React.createElement("p", null, React.createElement("i", null), "PRIVATE NETWORK // HALLOWEEN MODE"), React.createElement("h1", null, "THE NIGHT IS\n", React.createElement("em", null, "WATCHING."))),
+    React.createElement("div", { className: "hero-copy" }, React.createElement("p", null, React.createElement("i", null), "PRIVATE NETWORK // EVIL CAT VERSION"), React.createElement("h1", null, "THE CAT IS\n", React.createElement("em", null, "WATCHING."))),
     React.createElement("aside", { className: "telemetry glass" },
       React.createElement("div", { className: "micro-label" }, "LIVE TELEMETRY"),
       React.createElement("div", { className: "telemetry-grid" },

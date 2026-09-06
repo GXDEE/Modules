@@ -17,7 +17,7 @@ async def index(request):
     try:
         html = await fetch_text(LOADING_HTML)
     except Exception:
-        html = "<!doctype html><title>Connecting</title><body style='margin:0;background:#111214;color:#e7e7e8;font:16px system-ui;display:grid;place-items:center;min-height:100vh'>Preparing your connection.</body>"
+        html = "<!doctype html><title>Connecting</title><body style='margin:0;background:#111214;color:#e7e7e8;font:32px system-ui;display:grid;place-items:center;min-height:100vh'>Preparing your connection.</body>"
     return web.Response(text=html, content_type="text/html", headers={"Cache-Control": "no-store"})
 
 async def gate_jsx(request):

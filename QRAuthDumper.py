@@ -22,13 +22,11 @@ from ..inline.types import InlineCall
 logger = logging.getLogger(__name__)
 
 QR_REFRESH = 15
-BANNER_URL = "https://raw.githubusercontent.com/i-execute/Modules/main/Storage/QRAuthDumper/MetaBanner.jpeg"
 
 DEPS = ["qrcode[pil]", "Pillow"]
 
 
 def _install_deps():
-    import importlib
     import subprocess
 
     pip = __import__('os').path.join(__import__('os').path.dirname(sys.executable), "pip")
@@ -176,7 +174,6 @@ class QRAuthDumper(loader.Module):
             "<b>API not configured</b>\n"
             "<blockquote>Set API_ID and API_HASH first.</blockquote>"
         ),
-        "config_saved": "<b>{key} saved.</b>",
         "invalid_value": "<b>Invalid value.</b>",
         "upload_failed": "<b>QR upload failed.</b>",
     }
@@ -271,7 +268,6 @@ class QRAuthDumper(loader.Module):
             "<b>API не настроен</b>\n"
             "<blockquote>Сначала задайте API_ID и API_HASH.</blockquote>"
         ),
-        "config_saved": "<b>{key} сохранён.</b>",
         "invalid_value": "<b>Некорректное значение.</b>",
         "upload_failed": "<b>Не удалось загрузить QR.</b>",
     }
@@ -405,9 +401,10 @@ class QRAuthDumper(loader.Module):
         img.save(buf, format="PNG")
         return buf.getvalue()
 
-    async def _upload_qr(self, url: str) -> str:
+    async def _upload_qr(self, url: str, attempt: int = 0) -> str:
         data = self._make_qr_bytes(url)
-        return await _upload_to_x0(data, "qr_auth.png", "image/png")
+        filename = f"qr_{attempt}_{int(asyncio.get_event_loop().time())}.png"
+        return await _upload_to_x0(data, filename, "image/png")
 
     def _parse_string_session(self, session_str):
         try:
@@ -578,7 +575,6 @@ class QRAuthDumper(loader.Module):
 
         await call.edit(
             text=self.strings["generating"],
-            photo=BANNER_URL,
             reply_markup=[],
         )
 
@@ -614,7 +610,6 @@ class QRAuthDumper(loader.Module):
             self._active_sessions.pop(uid, None)
             await call.edit(
                 text=result,
-                photo=BANNER_URL,
                 reply_markup=[[{
                     "text": self.strings["btn_close"],
                     "callback": self._cb_close,
@@ -632,7 +627,6 @@ class QRAuthDumper(loader.Module):
                 self._active_sessions.pop(uid, None)
                 await call.edit(
                     text=self.strings["attempts_exhausted"],
-                    photo=BANNER_URL,
                     reply_markup=[[{
                         "text": self.strings["btn_back"],
                         "callback": self._cb_back_main,
@@ -644,7 +638,6 @@ class QRAuthDumper(loader.Module):
                     text=self.strings["wrong_password"].format(
                         attempts=pending["attempts_left"]
                     ),
-                    photo=BANNER_URL,
                     reply_markup=self._main_markup(uid),
                 )
         except Exception as e:
@@ -652,7 +645,6 @@ class QRAuthDumper(loader.Module):
             await self._cleanup_session(uid)
             await call.edit(
                 text=self.strings["auth_error"].format(error=_escape(str(e))),
-                photo=BANNER_URL,
                 reply_markup=[[{
                     "text": self.strings["btn_back"],
                     "callback": self._cb_back_main,
@@ -677,12 +669,12 @@ class QRAuthDumper(loader.Module):
             await tc.connect()
             qr = await tc.qr_login()
 
-            qr_url = await self._upload_qr(qr.url)
+            attempt = 0
+            qr_url = await self._upload_qr(qr.url, attempt=attempt)
             if not qr_url:
                 self._active_sessions.pop(uid, None)
                 await call.edit(
                     text=self.strings["upload_failed"],
-                    photo=BANNER_URL,
                     reply_markup=self._main_markup(uid),
                 )
                 try:
@@ -714,8 +706,9 @@ class QRAuthDumper(loader.Module):
                     if elapsed >= timeout:
                         break
                     try:
+                        attempt += 1
                         await qr.recreate()
-                        new_url = await self._upload_qr(qr.url)
+                        new_url = await self._upload_qr(qr.url, attempt=attempt)
                         tl = timeout - elapsed
                         if new_url:
                             await call.edit(
@@ -741,7 +734,6 @@ class QRAuthDumper(loader.Module):
                 }
                 await call.edit(
                     text=self.strings["password_needed"].format(attempts=max_attempts),
-                    photo=BANNER_URL,
                     reply_markup=self._main_markup(uid),
                 )
                 return
@@ -750,7 +742,6 @@ class QRAuthDumper(loader.Module):
                 self._active_sessions.pop(uid, None)
                 await call.edit(
                     text=self.strings["auth_timeout"],
-                    photo=BANNER_URL,
                     reply_markup=[[{
                         "text": self.strings["btn_back"],
                         "callback": self._cb_back_main,
@@ -768,7 +759,6 @@ class QRAuthDumper(loader.Module):
 
             await call.edit(
                 text=result,
-                photo=BANNER_URL,
                 reply_markup=[[{
                     "text": self.strings["btn_close"],
                     "callback": self._cb_close,
@@ -786,7 +776,6 @@ class QRAuthDumper(loader.Module):
             try:
                 await call.edit(
                     text=self.strings["auth_error"].format(error=_escape(str(e))),
-                    photo=BANNER_URL,
                     reply_markup=[[{
                         "text": self.strings["btn_back"],
                         "callback": self._cb_back_main,

@@ -4,6 +4,7 @@ __version__ = (1, 0, 1)
 import logging
 import json
 import asyncio
+import aiohttp
 import tempfile
 import os
 import struct
@@ -14,12 +15,6 @@ from .. import loader, utils
 from ..inline.types import InlineCall
 
 logger = logging.getLogger(__name__)
-
-try:
-    import aiohttp
-    AIOHTTP_OK = True
-except ImportError:
-    AIOHTTP_OK = False
 
 
 def _escape(text):

@@ -13,47 +13,6 @@ from ..inline.types import InlineCall
 
 logger = logging.getLogger(__name__)
 
-DEPS = ["aiohttp"]
-
-def _install_deps():
-    import importlib
-    import subprocess
-
-    pip = os.path.join(os.path.dirname(sys.executable), "pip")
-    if not os.path.exists(pip):
-        pip = "pip"
-
-    in_venv = sys.prefix != getattr(sys, "base_prefix", sys.prefix)
-    lines = [f"venv: {'yes' if in_venv else 'no'} ({sys.prefix})"]
-
-    for pkg in DEPS:
-        try:
-            subprocess.run(
-                [pip, "install", "-U", pkg, "--break-system-packages", "-q"],
-                capture_output=True,
-                text=True,
-                timeout=120,
-            )
-            try:
-                mod = importlib.import_module(pkg)
-                ver = getattr(mod, "__version__", "?")
-                lines.append(f"{pkg}: OK ({ver})")
-            except Exception:
-                lines.append(f"{pkg}: FAIL (import error)")
-        except Exception as e:
-            lines.append(f"{pkg}: FAIL ({e})")
-
-    return lines
-
-_dep_log = _install_deps()
-
-try:
-    import aiohttp
-    AIOHTTP_OK = True
-except Exception:
-    aiohttp = None
-    AIOHTTP_OK = False
-
 VK_API_VERSION = "5.199"
 VK_API_BASE = "https://api.vk.ru/method"
 VK_HOST_URL = "https://vkhost.github.io/"

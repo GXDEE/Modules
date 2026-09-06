@@ -68,7 +68,6 @@ def _log(tag: str, msg: str):
 
 def _ensure_all_deps():
     for mod, pip in {
-        "aiohttp": "aiohttp",
         "mutagen": "mutagen",
         "yandex_music": "yandex-music",
         "PIL": "Pillow",

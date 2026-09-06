@@ -10,7 +10,7 @@ import importlib
 
 logger = logging.getLogger(__name__)
 
-DEPS = ["qrcode", "Pillow", "pyzbar", "aiohttp"]
+DEPS = ["qrcode", "Pillow", "pyzbar"]
 
 
 def _install_deps():

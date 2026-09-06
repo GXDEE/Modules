@@ -19,7 +19,7 @@ from ..inline.types import InlineCall
 
 logger = logging.getLogger(__name__)
 
-DEPS = ["yt-dlp", "aiohttp", "Pillow", "mutagen"]
+DEPS = ["yt-dlp", "Pillow", "mutagen"]
 
 
 def _install_deps():
@@ -28,7 +28,7 @@ def _install_deps():
     pip = os.path.join(os.path.dirname(sys.executable), "pip")
     if not os.path.exists(pip):
         pip = "pip"
-    imp_map = {"yt-dlp": "yt_dlp", "Pillow": "PIL", "aiohttp": "aiohttp", "mutagen": "mutagen"}
+    imp_map = {"yt-dlp": "yt_dlp", "Pillow": "PIL", "mutagen": "mutagen"}
     lines = []
     for pkg in DEPS:
         try:

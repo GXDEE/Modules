@@ -19,7 +19,7 @@ from telethon.utils import html as tl_html
 
 from .. import loader, utils
 
-DEPS = ["aiohttp", "Pillow"]
+DEPS = ["Pillow"]
 
 
 def _install_deps():

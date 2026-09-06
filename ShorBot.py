@@ -6,40 +6,13 @@ import sys
 import time
 import math
 import random
+import aiohttp
 import asyncio
 import logging
 
 from .. import loader, utils
 
-try:
-    import aiohttp
-except ImportError:
-    aiohttp = None
-
 logger = logging.getLogger(__name__)
-
-DEPS = ["aiohttp"]
-
-
-def _install_deps():
-    import importlib, subprocess, os
-    pip = os.path.join(os.path.dirname(sys.executable), "pip")
-    if not os.path.exists(pip):
-        pip = "pip"
-    lines = []
-    for pkg in DEPS:
-        try:
-            subprocess.run(
-                [pip, "install", "-U", pkg, "--break-system-packages", "-q"],
-                capture_output=True, text=True, timeout=120,
-            )
-            importlib.invalidate_caches()
-            importlib.import_module(pkg)
-            lines.append(f"{pkg}: OK")
-        except Exception as e:
-            lines.append(f"{pkg}: FAIL ({e})")
-    return "\n".join(lines)
-
 
 def _escape_html(t):
     if not t:
@@ -461,8 +434,6 @@ class ShorBot(loader.Module):
     async def client_ready(self, client, db):
         self._client = client
         self._db = db
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, _install_deps)
         if self.config["BOT_TOKEN"]:
             try:
                 await self._launch(self.config["BOT_TOKEN"])

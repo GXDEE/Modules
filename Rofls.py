@@ -51,7 +51,7 @@ FONT_PATHS = [
 
 
 def _ensure_all_deps():
-    for mod, pip_name in {"PIL": "Pillow", "aiohttp": "aiohttp"}.items():
+    for mod, pip_name in {"PIL": "Pillow"}.items():
         try:
             __import__(mod)
         except ImportError:

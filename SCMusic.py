@@ -19,7 +19,7 @@ from ..inline.types import InlineCall
 
 logger = logging.getLogger(__name__)
 
-DEPS = ["curl_cffi", "Pillow", "mutagen", "aiohttp"]
+DEPS = ["curl_cffi", "Pillow", "mutagen"]
 
 
 def _install_deps():
@@ -34,7 +34,6 @@ def _install_deps():
         "curl_cffi": "curl_cffi",
         "Pillow": "PIL",
         "mutagen": "mutagen",
-        "aiohttp": "aiohttp",
     }
     
     lines = []

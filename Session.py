@@ -591,7 +591,7 @@ class Session(loader.Module):
                     int(self.config["API_ID"]),
                     self.config["API_HASH"],
                     device_model="SessionTest",
-                    system_version="By @I_execute",
+                    system_version="By @Execute_forge",
                     app_version=f"v{'.'.join(map(str, __version__))}",
                 )
                 await asyncio.wait_for(test_client.connect(), timeout=15)
@@ -864,7 +864,7 @@ class Session(loader.Module):
                 int(self.config["API_ID"]),
                 self.config["API_HASH"],
                 device_model="SessionManager",
-                system_version="By @I_execute",
+                system_version="By @Execute_forge",
                 app_version=f"v{'.'.join(map(str, __version__))}",
             )
             await client.connect()

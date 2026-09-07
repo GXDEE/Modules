@@ -56,4 +56,4 @@ Universal media downloader module. Runs as a Telegram bot (linked via a bot toke
 
 ### Contributing
 
-Pull requests are welcome. For major changes, open an issue first or contact me in telegram via comments in channel [@Hotaru_modules](https://t.me/Hotaru_modules) You also can suggest me idea for module, but firstly tap on star 
+Pull requests are welcome. For major changes, open an issue first or contact me in telegram via comments in channel [@Execute_forge](https://t.me/Execute_forge) You also can suggest me idea for module, but firstly tap on star

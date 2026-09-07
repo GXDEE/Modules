@@ -1,5 +1,11 @@
-__version__ = (2, 0, 0)
-# meta developer: I_execute.t.me forked from @codrago_m
+# CopyLeft 2026 github.com/i-execute
+# Telegram author: I_execute.t.me
+# Telegram feedback: Execute_forge.t.me
+# Licensed under AGPLv3.
+# For personal use only.
+
+__version__ = (3, 0, 0)
+# meta developer: I_execute.t.me
 # meta banner: https://github.com/i-execute/Modules/raw/main/Storage/YNDXMusic/MetaBannerNew.jpeg
 
 import os

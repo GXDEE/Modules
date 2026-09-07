@@ -1,3 +1,9 @@
+# CopyLeft 2026 github.com/i-execute
+# Telegram author: I_execute.t.me
+# Telegram feedback: Execute_forge.t.me
+# Licensed under AGPLv3.
+# For personal use only.
+
 __version__ = (2, 4, 3)
 # meta developer: I_execute.t.me
 # meta banner: https://raw.githubusercontent.com/i-execute/Modules/main/Storage/InlineDL/MetaBannerNew.jpeg

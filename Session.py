@@ -1,3 +1,9 @@
+# CopyLeft 2026 github.com/i-execute
+# Telegram author: I_execute.t.me
+# Telegram feedback: Execute_forge.t.me
+# Licensed under AGPLv3.
+# For personal use only.
+
 __version__ = (2, 3, 4)
 # meta developer: I_execute.t.me
 # meta banner: https://raw.githubusercontent.com/i-execute/Modules/main/Storage/Session/MetaBanner.jpeg
@@ -39,7 +45,6 @@ def _safe_disconnect(client):
             asyncio.ensure_future(client.disconnect())
         except Exception:
             pass
-
 
 @loader.tds
 class Session(loader.Module):

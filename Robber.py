@@ -2,7 +2,6 @@
 # Telegram author: I_execute.t.me
 # Telegram feedback: Execute_forge.t.me
 # Licensed under AGPLv3.
-# For personal use only.
 
 __version__ = (2, 0, 0)
 # meta developer: I_execute.t.me

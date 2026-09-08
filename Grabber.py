@@ -932,30 +932,34 @@ class Grabber(loader.Module):
         title_block = f"<b>{title}</b>"
         debug_block = f'<pre><code class="language-grabber">{chr(10).join(inner)}</code></pre>'
         return f"{title_block}\n{debug_block}"
-    def _make_progress_hook(self, task_id):
+    def _make_progress_hook(self, task_id, final=True):
         def _hook(d):
             dl = self._current_downloads.get(task_id)
             if not dl:
                 return
             status = d.get("status")
+            base = dl.get("_dl_base_mb", 0.0)
             if status == "downloading":
                 total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
                 downloaded = d.get("downloaded_bytes", 0)
                 speed = d.get("speed") or 0
-                dl["dl_percent"] = (downloaded / total * 100) if total > 0 else 0
-                dl["dl_size"] = downloaded / 1024 / 1024
-                dl["dl_total"] = total / 1024 / 1024 if total > 0 else dl["dl_size"]
+                cur_total_mb = total / 1024 / 1024 if total > 0 else 0
+                dl["dl_size"] = base + downloaded / 1024 / 1024
+                dl["dl_total"] = base + cur_total_mb if cur_total_mb else dl["dl_size"]
+                dl["dl_percent"] = (dl["dl_size"] / dl["dl_total"] * 100) if dl["dl_total"] > 0 else 0
                 dl["dl_speed_bytes"] = speed
                 dl["stage"] = "dl"
                 dl["active"] = True
             elif status == "finished":
                 total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
                 size_mb = total / 1024 / 1024
-                dl["dl_done"] = True
+                new_base = base + size_mb if size_mb > 0 else base
+                dl["_dl_base_mb"] = new_base
+                dl["dl_size"] = new_base
+                dl["dl_total"] = new_base
                 dl["dl_percent"] = 100.0
-                if size_mb > 0:
-                    dl["dl_total"] = dl.get("dl_total", 0) + size_mb
-                    dl["dl_size"] = dl["dl_total"]
+                if final:
+                    dl["dl_done"] = True
         return _hook
     def _make_pp_hook(self, task_id):
         def _hook(d):
@@ -2741,7 +2745,7 @@ class Grabber(loader.Module):
                     **base_opts,
                     "outtmpl": video_out,
                     "format": self._build_video_only_format(height),
-                    "progress_hooks": [self._make_progress_hook(task_id)],
+                    "progress_hooks": [self._make_progress_hook(task_id, final=False)],
                 }
                 done_v = asyncio.Event()
                 dl_error = [None]
@@ -2830,7 +2834,19 @@ class Grabber(loader.Module):
                         stdout=asyncio.subprocess.PIPE,
                         stderr=asyncio.subprocess.PIPE,
                     )
-                    await proc.communicate()
+                    try:
+                        stdout_data, stderr_data = await asyncio.wait_for(proc.communicate(), timeout=300)
+                    except asyncio.TimeoutError:
+                        proc.kill()
+                        try:
+                            await proc.communicate()
+                        except Exception:
+                            pass
+                        logger.error(f"[GRABBER] ffmpeg merge timeout (>300s): {vf} + {af}")
+                        stderr_data = b""
+                    else:
+                        if proc.returncode != 0:
+                            logger.error(f"[GRABBER] ffmpeg merge failed rc={proc.returncode}: {stderr_data.decode(errors='replace')[:500]}")
                     dl["ffmpeg_active"] = False
                     dl["ffmpeg_done"] = True
                     if proc.returncode == 0 and os.path.exists(merged) and os.path.getsize(merged) > 0:

@@ -1,10 +1,9 @@
 # CopyLeft 2026 github.com/i-execute
-# Telegram author: I_execute.t.me
-# Telegram feedback: Execute_forge.t.me
+# Author: I_execute.t.me
 # Licensed under AGPLv3.
 
 __version__ = (2, 1, 3)
-# meta developer: I_execute.t.me
+# meta developer: Execute_forge.t.me
 # meta banner: https://raw.githubusercontent.com/i-execute/Modules/main/Storage/Info/MetaBanner.jpeg
 
 from telethon.tl.types import User, Channel, Message, InputPhotoFileLocation

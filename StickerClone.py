@@ -1,10 +1,9 @@
 # CopyLeft 2026 github.com/i-execute
-# Telegram author: I_execute.t.me
-# Telegram feedback: Execute_forge.t.me
+# Author: I_execute.t.me
 # Licensed under AGPLv3.
 
 __version__ = (1, 2, 0)
-# meta developer: I_execute.t.me froked from @elisartix
+# meta developer: Execute_forge.t.me froked from @elisartix
 
 import asyncio
 import io
